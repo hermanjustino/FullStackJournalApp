@@ -1,2 +1,2 @@
 # FullStackJournal
-Project files for 
+ios appplication for MyJournal Web App
