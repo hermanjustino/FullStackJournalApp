@@ -16,53 +16,316 @@ struct Post: Decodable {
 
 class ViewController: UITableViewController {
     
+    var email: UITextField!
+        var password: UITextField!
+    var confirm: UITextField!
+    var fullName: UITextField!
+    
+    var postTitle: UITextField!
+    var postBody: UITextField!
+    
+    var refresher: UIRefreshControl!
+    
+    @IBOutlet weak var btnNewNote: UIButton!
+    
+    @IBOutlet weak var btnSignUp: UIButton!
+    
+    @IBAction func btnSignClicked(_ sender: UIButton) {
+        
+        createForm(message: "Create an account for your very own notes!")
+        
+        
+    }
+    
+    @objc func refresh(){
+
+        self.tableView.reloadData()
+        
+        self.fetchPosts()
+        
+                self.refresher.endRefreshing()
+            print("refreshed")
+
+        }
+    
+    
+    
+    @IBAction func btnNewClicked(_ sender: UIButton) {
+        
+        createPost(message: "Create your newest Note!")
+        
+        /*
+         
+         let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+                 
+                 //create cancel button
+                 let cancelAction = UIAlertAction(title: "Cancel" , style: .cancel)
+                 
+                 //create save button
+                 let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) -> Void in
+                    //validation logic goes here
+                     if((self.firstName.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!
+                         || (self.lastName.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!
+                         || (self.email.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)! ){
+                         //if this code is run, that mean at least of the fields doesn't have value
+                         self.firstName.text = ""
+                         self.lastName.text = ""
+                         self.email.text = ""
+                         
+                         self.displayForm(message: "One of the values entered was invalid. Please enter guest information")
+                     }
+                     
+                     print("This entry was added for guest name: \(String(describing: self.firstName.text)) \(String(describing: self.lastName.text)), email : \(String(describing: self.email.text))")
+                 }
+                 
+                 //add button to alert
+                 alert.addAction(cancelAction)
+                 alert.addAction(saveAction)
+                 
+                 //create first name textfield
+                 alert.addTextField(configurationHandler: {(textField: UITextField!) in
+                     textField.placeholder = "Type first name here..."
+                     self.firstName = textField
+                 })
+                 
+                 //create last name textfield
+                 alert.addTextField(configurationHandler: {(textField: UITextField!) in
+                     textField.placeholder = "Type last name here..."
+                     self.lastName = textField
+                 })
+                 
+                 //create email field
+                 alert.addTextField(configurationHandler: {(textField: UITextField!) in
+                     textField.placeholder = "Type email here..."
+                     self.email = textField
+                 })
+                 
+                 self.present(alert, animated: true, completion: nil)
+             }
+         */
+        
+        
+       
+        
+    }
     
     @IBAction func btnLoginClicked(_ sender: UIButton) {
         
-        print("Perform loginand refetch posts")
+        displayForm(message: "Please enter login information")
         
-        guard let url = URL(string: "http://localhost:1337/api/v1/entrance/login") else {return}
+        print("Perform login and refetch posts")
+        
        
-        var loginRequest = URLRequest(url: url)
-        loginRequest.httpMethod = "PUT"
-        
-        do {
-            
-            let params = ["emailAddress": "nemo@hotmail.com", "password": "marlin"]
-            
-            loginRequest.httpBody = try JSONSerialization.data(withJSONObject: params, options: .init())
-            
-            URLSession.shared.downloadTask(with: loginRequest) { (data, resp, err) in
-                
-                if let err = err {
-                    print("failed to log in: ", err)
-                    return
-                }
-                
-                print("Probably logged in ")
-                self.fetchPosts()
-                
-            }.resume()
-            
-        } catch {
-            print("failed to serialize data", error)
-        }
-            
     }
     
-    @IBAction func btnCreateClicked(_ sender: UIButton) {
-        print("creating Post...")
-        Service.shared.createPost(title: "IOS Title", body: "IOS Post Body") {
-            (err) in
-            if let err = err {
-                print("Failed to create post body", err)
-                return
+    func createPost(message: String) {
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+                
+                //create cancel button
+                let cancelAction = UIAlertAction(title: "Cancel" , style: .cancel)
+                
+                //create save button
+                let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) -> Void in
+                   //validation logic goes here
+                    if((self.postTitle.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!
+                        || (self.postBody.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)! ){
+                        //if this code is run, that mean at least of the fields doesn't have value
+                        self.postBody.text = ""
+                        self.postTitle.text = ""
+                        
+                        self.displayForm(message: "One of the values entered was invalid. Please enter guest information")
+                    }
+                    
+                    Service.shared.createPost(title: "\(String(describing: self.postTitle.text!))", body: "\(String(describing: self.postBody.text!))") {
+                        (err) in
+                        if let err = err {
+                            print("Failed to create post body", err)
+                            return
+                        }
+                        print("Finished creating post")
+                        self.fetchPosts()
+                    }
+                }
+                
+                //add button to alert
+                alert.addAction(cancelAction)
+                alert.addAction(saveAction)
+                
+                //create first name textfield
+                alert.addTextField(configurationHandler: {(textField: UITextField!) in
+                    textField.placeholder = "Enter title here..."
+                    self.postTitle = textField
+                })
+                
+                //create last name textfield
+                alert.addTextField(configurationHandler: {(textField: UITextField!) in
+                    textField.placeholder = "Note..."
+                    self.postBody = textField
+                })
+                
+               
+                
+                self.present(alert, animated: true, completion: nil)
             }
-            print("Finished creating post")
-            self.fetchPosts()
+    
+    func displayForm(message:String){
+            //create alert
+        
+        
+            let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+            
+            //create cancel button
+            let cancelAction = UIAlertAction(title: "Cancel" , style: .cancel)
+            
+            //create save button
+            let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) -> Void in
+               //validation logic goes here
+                if((self.email.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!
+                    || (self.password.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!){
+                    //if this code is run, that mean at least of the fields doesn't have value
+                    
+                    self.email.text = ""
+                    self.password.text = ""
+                    
+                    self.displayForm(message: "One of the values entered was invalid. Please enter guest information")
+                }
+                
+                guard let url = URL(string: "http://localhost:1337/api/v1/entrance/login") else {return}
+               
+                var loginRequest = URLRequest(url: url)
+                loginRequest.httpMethod = "PUT"
+                
+                do {
+                    
+                    let params = ["emailAddress": "\(self.email.text ?? "nil")", "password": "\(self.password.text ?? "nil")"]
+                    
+                    loginRequest.httpBody = try JSONSerialization.data(withJSONObject: params, options: .init())
+                    
+                    URLSession.shared.downloadTask(with: loginRequest) { (data, resp, err) in
+                        
+                        if let err = err {
+                            print("failed to log in: ", err)
+                            return
+                        }
+                        
+                        print("Probably logged in ")
+                        self.fetchPosts()
+                        
+                        
+                        DispatchQueue.main.async {
+                            self.btnNewNote.alpha = 1
+                        }
+                        
+                    }.resume()
+                    
+                } catch {
+                    print("failed to serialize data", error)
+                }
+            }
+            
+            //add button to alert
+            alert.addAction(cancelAction)
+            alert.addAction(saveAction)
+            
+            alert.addTextField(configurationHandler: {(textField: UITextField!) in
+                textField.placeholder = "Type email here..."
+                self.email = textField
+            })
+            
+            alert.addTextField(configurationHandler: {(textField: UITextField!) in
+                textField.placeholder = "Type password here..."
+                self.password = textField
+                self.password.isSecureTextEntry = true
+            })
+            
+            
+            self.present(alert, animated: true, completion: nil)
+        }
+    
+    func createForm(message: String) {
+        
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        
+        //create cancel button
+        let cancelAction = UIAlertAction(title: "Cancel" , style: .cancel)
+        
+        //create save button
+        let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) -> Void in
+           //validation logic goes here
+            if((self.email.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!
+                || (self.password.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!
+                || (self.confirm.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!){
+                //if this code is run, that mean at least of the fields doesn't have value
+                
+                self.email.text = ""
+                self.password.text = ""
+                self.fullName.text = ""
+                
+                self.displayForm(message: "One of the values entered was invalid. Please enter guest information")
+            }
+            
+            guard let url = URL(string: "http://localhost:1337/api/v1/entrance/signup") else {return}
+           
+            var signUpRequest = URLRequest(url: url)
+            signUpRequest.httpMethod = "POST"
+            
+            do {
+                
+                let params = ["emailAddress": "\(self.email.text ?? "nil")", "password": "\(self.password.text ?? "nil")", "fullName": "\(self.fullName.text ?? "nil")"]
+                
+                signUpRequest.httpBody = try JSONSerialization.data(withJSONObject: params, options: .init())
+                
+                URLSession.shared.downloadTask(with: signUpRequest) { (data, resp, err) in
+                    
+                    if let err = err {
+                        print("failed to create User: ", err)
+                        return
+                    }
+                    
+                    print("Probably created User ")
+                    self.fetchPosts()
+                    
+                }.resume()
+                
+            } catch {
+                print("failed to serialize data", error)
+            }
         }
         
+        //add button to alert
+        alert.addAction(cancelAction)
+        alert.addAction(saveAction)
+        
+        alert.addTextField(configurationHandler: {(textField: UITextField!) in
+            textField.placeholder = "Enter full name..."
+            self.fullName = textField
+        })
+        
+        alert.addTextField(configurationHandler: {(textField: UITextField!) in
+            textField.placeholder = "Type email here..."
+            self.email = textField
+        })
+        
+        alert.addTextField(configurationHandler: {(textField: UITextField!) in
+            textField.placeholder = "Type password here..."
+            self.password = textField
+            self.password.isSecureTextEntry = true
+        })
+        
+        
+        alert.addTextField(configurationHandler: {(textField: UITextField!) in
+            textField.placeholder = "Confirm Password..."
+            self.confirm = textField
+            self.confirm.isSecureTextEntry = true
+        })
+        
+        self.present(alert, animated: true, completion: nil)
     }
+    
+    
+    
+   
+    
     var posts = [Post]()
     
     fileprivate func fetchPosts() {
@@ -118,6 +381,13 @@ class ViewController: UITableViewController {
     
 
     override func viewDidLoad() {
+        
+        refresher = UIRefreshControl()
+               refresher.attributedTitle = NSAttributedString(string: "pull to refresh")
+
+        refresher.addTarget(self, action: #selector(ViewController.refresh), for: UIControl.Event.valueChanged)
+               self.tableView.addSubview(refresher)
+               refresh()
         
         fetchPosts()
         super.viewDidLoad()
