@@ -160,7 +160,7 @@ class ViewController: UITableViewController {
                         
                         DispatchQueue.main.async {
                             
-                            self.navigationController?.navigationBar.barTintColor = .blue
+                            self.navigationController?.navigationBar.barTintColor = .systemBlue
                             self.btnSignUp.alpha = 0
                             self.btnLogin.alpha = 0
                             self.btnNewNote.alpha = 1
