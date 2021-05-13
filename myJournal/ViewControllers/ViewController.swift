@@ -24,7 +24,10 @@ class ViewController: UITableViewController {
     var postTitle: UITextField!
     var postBody: UITextField!
     
+
+    
     var refresher: UIRefreshControl!
+    @IBOutlet weak var btnLogin: UIButton!
     
     @IBOutlet weak var btnNewNote: UIButton!
     
@@ -38,75 +41,17 @@ class ViewController: UITableViewController {
     }
     
     @objc func refresh(){
-
         self.tableView.reloadData()
         
         self.fetchPosts()
-        
                 self.refresher.endRefreshing()
             print("refreshed")
-
         }
     
     
     
     @IBAction func btnNewClicked(_ sender: UIButton) {
-        
         createPost(message: "Create your newest Note!")
-        
-        /*
-         
-         let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
-                 
-                 //create cancel button
-                 let cancelAction = UIAlertAction(title: "Cancel" , style: .cancel)
-                 
-                 //create save button
-                 let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) -> Void in
-                    //validation logic goes here
-                     if((self.firstName.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!
-                         || (self.lastName.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)!
-                         || (self.email.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)! ){
-                         //if this code is run, that mean at least of the fields doesn't have value
-                         self.firstName.text = ""
-                         self.lastName.text = ""
-                         self.email.text = ""
-                         
-                         self.displayForm(message: "One of the values entered was invalid. Please enter guest information")
-                     }
-                     
-                     print("This entry was added for guest name: \(String(describing: self.firstName.text)) \(String(describing: self.lastName.text)), email : \(String(describing: self.email.text))")
-                 }
-                 
-                 //add button to alert
-                 alert.addAction(cancelAction)
-                 alert.addAction(saveAction)
-                 
-                 //create first name textfield
-                 alert.addTextField(configurationHandler: {(textField: UITextField!) in
-                     textField.placeholder = "Type first name here..."
-                     self.firstName = textField
-                 })
-                 
-                 //create last name textfield
-                 alert.addTextField(configurationHandler: {(textField: UITextField!) in
-                     textField.placeholder = "Type last name here..."
-                     self.lastName = textField
-                 })
-                 
-                 //create email field
-                 alert.addTextField(configurationHandler: {(textField: UITextField!) in
-                     textField.placeholder = "Type email here..."
-                     self.email = textField
-                 })
-                 
-                 self.present(alert, animated: true, completion: nil)
-             }
-         */
-        
-        
-       
-        
     }
     
     @IBAction func btnLoginClicked(_ sender: UIButton) {
@@ -209,10 +154,15 @@ class ViewController: UITableViewController {
                         }
                         
                         print("Probably logged in ")
+                        
                         self.fetchPosts()
                         
                         
                         DispatchQueue.main.async {
+                            
+                            self.navigationController?.navigationBar.barTintColor = .blue
+                            self.btnSignUp.alpha = 0
+                            self.btnLogin.alpha = 0
                             self.btnNewNote.alpha = 1
                         }
                         
@@ -376,6 +326,27 @@ class ViewController: UITableViewController {
         cell.detailTextLabel?.text = post.body
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let selectedCell = posts[indexPath.row]
+        let _: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        if let viewController = storyboard?.instantiateViewController(identifier: "NoteVC") as? NoteVC {
+            
+            viewController.head = selectedCell.title
+            viewController.head = selectedCell.body
+            
+            navigationController?.pushViewController(viewController, animated: true)
+            
+            
+            viewController.title = posts[indexPath.row].title
+            
+        }
+   
+        print("you tapped me")
+        
     }
     
     

@@ -144,6 +144,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="btnLogin" destination="ADx-g5-Dci" id="edO-4V-QDu"/>
                         <outlet property="btnNewNote" destination="MKj-bB-jqI" id="Wgj-dP-Jg3"/>
                         <outlet property="btnSignUp" destination="urP-wX-gg8" id="fgu-z7-1GL"/>
                     </connections>
